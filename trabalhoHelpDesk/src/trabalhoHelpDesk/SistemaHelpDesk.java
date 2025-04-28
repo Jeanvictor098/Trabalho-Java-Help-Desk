@@ -14,8 +14,8 @@ public class SistemaHelpDesk {
         chamados = new ArrayList<>();
     }
 
-    // Cadastro de Funcionário com validação
-    public void cadastrarFuncionario1() {
+    // Cadastro de Funcionário com validação manual
+    public void cadastrarFuncionario() {
         String nome = JOptionPane.showInputDialog("Digite o nome do Funcionário:");
         String email = JOptionPane.showInputDialog("Digite o email do Funcionário:");
         String setor = JOptionPane.showInputDialog("Digite o setor do Funcionário:");
@@ -25,13 +25,17 @@ public class SistemaHelpDesk {
             return;
         }
 
+        if (!nome.matches("[a-zA-ZÀ-ÿ\\s]+")) {
+            JOptionPane.showMessageDialog(null, "Erro: O nome não pode conter números!");
+            return;
+        }
+
         Funcionario funcionario = new Funcionario(nome, email, setor);
         funcionarios.add(funcionario);
         JOptionPane.showMessageDialog(null, "Funcionário cadastrado com sucesso!");
     }
 
-    // Cadastro de Técnico com validação
-    public void cadastrarTecnico1() {
+    public void cadastrarTecnico() {
         String nome = JOptionPane.showInputDialog("Digite o nome do Técnico:");
         String especialidade = JOptionPane.showInputDialog("Digite a especialidade do Técnico:");
 
@@ -40,22 +44,28 @@ public class SistemaHelpDesk {
             return;
         }
 
+        if (!nome.matches("[a-zA-ZÀ-ÿ\\s]+")) {
+            JOptionPane.showMessageDialog(null, "Erro: O nome não pode conter números!");
+            return;
+        }
+
         Tecnico tecnico = new Tecnico(nome, especialidade);
         tecnicos.add(tecnico);
         JOptionPane.showMessageDialog(null, "Técnico cadastrado com sucesso!");
     }
 
-    // Abertura de Chamado com validação
-    public void abrirChamado1() {
+    
+    // Abertura de Chamado com validação manual
+    public void abrirChamado() {
         String titulo = JOptionPane.showInputDialog("Digite o título do chamado:");
         String descricao = JOptionPane.showInputDialog("Digite a descrição do chamado:");
-        Funcionario funcionario = selecionarFuncionario();
 
         if (titulo == null || titulo.isEmpty() || descricao == null || descricao.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Erro: Título e descrição do chamado devem ser preenchidos!");
             return;
         }
 
+        Funcionario funcionario = selecionarFuncionario();
         if (funcionario == null) {
             JOptionPane.showMessageDialog(null, "Erro: Nenhum funcionário selecionado!");
             return;
@@ -66,8 +76,8 @@ public class SistemaHelpDesk {
         JOptionPane.showMessageDialog(null, "Chamado aberto com sucesso!");
     }
 
-    // Atribuir Técnico ao Chamado com validação
-    public void atribuirTecnicoChamado1() {
+    // Atribuir Técnico ao Chamado com validação manual
+    public void atribuirTecnicoChamado() {
         Chamado chamado = selecionarChamado();
         if (chamado == null) {
             JOptionPane.showMessageDialog(null, "Erro: Chamado não encontrado!");
@@ -84,8 +94,8 @@ public class SistemaHelpDesk {
         JOptionPane.showMessageDialog(null, "Técnico atribuído ao chamado!");
     }
 
-    // Atualizar Status do Chamado com validação
-    public void atualizarStatusChamado1() {
+    // Atualizar Status do Chamado com validação manual
+    public void atualizarStatusChamado() {
         Chamado chamado = selecionarChamado();
         if (chamado == null) {
             JOptionPane.showMessageDialog(null, "Erro: Chamado não encontrado!");
@@ -103,45 +113,54 @@ public class SistemaHelpDesk {
         JOptionPane.showMessageDialog(null, "Status do chamado atualizado para " + novoStatus);
     }
 
-    // Selecionar Funcionário
+    // Selecionar Funcionário sem método genérico
     private Funcionario selecionarFuncionario() {
         if (funcionarios.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Erro: Nenhum funcionário cadastrado!");
             return null;
         }
 
-        return validarSelecao("Selecione o funcionário:", funcionarios);
-    }
-
-    // Selecionar Chamado
-    private Chamado selecionarChamado() {
-        if (chamados.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Erro: Nenhum chamado cadastrado!");
-            return null;
+        StringBuilder sb = new StringBuilder("Selecione o funcionário:\n");
+        for (int i = 0; i < funcionarios.size(); i++) {
+            sb.append(i + 1).append(" - ").append(funcionarios.get(i).getNome()).append("\n");
         }
 
-        return validarSelecao("Selecione o chamado:", chamados);
+        return obterSelecao(sb.toString(), funcionarios);
     }
 
-    // Selecionar Técnico
+    // Selecionar Técnico sem método genérico
     private Tecnico selecionarTecnico() {
         if (tecnicos.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Erro: Nenhum técnico cadastrado!");
             return null;
         }
 
-        return validarSelecao("Selecione o técnico:", tecnicos);
-    }
-
-    // Método genérico para validar seleção
-    private <T> T validarSelecao(String mensagem, ArrayList<T> lista) {
-        StringBuilder sb = new StringBuilder(mensagem).append("\n");
-        for (int i = 0; i < lista.size(); i++) {
-            sb.append(i + 1).append(" - ").append(lista.get(i)).append("\n");
+        StringBuilder sb = new StringBuilder("Selecione o técnico:\n");
+        for (int i = 0; i < tecnicos.size(); i++) {
+            sb.append(i + 1).append(" - ").append(tecnicos.get(i).getNome()).append("\n");
         }
 
-        String escolha = JOptionPane.showInputDialog(sb.toString());
+        return obterSelecao(sb.toString(), tecnicos);
+    }
 
+    // Selecionar Chamado sem método genérico
+    private Chamado selecionarChamado() {
+        if (chamados.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Erro: Nenhum chamado cadastrado!");
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder("Selecione o chamado:\n");
+        for (int i = 0; i < chamados.size(); i++) {
+            sb.append(i + 1).append(" - ").append(chamados.get(i).getTitulo()).append("\n");
+        }
+
+        return obterSelecao(sb.toString(), chamados);
+    }
+
+    // Método para obtenção de seleção sem uso de um método genérico separado
+    private <T> T obterSelecao(String mensagem, ArrayList<T> lista) {
+        String escolha = JOptionPane.showInputDialog(mensagem);
         if (escolha == null || escolha.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Erro: Entrada inválida!");
             return null;
@@ -160,33 +179,13 @@ public class SistemaHelpDesk {
         }
     }
 
-    // Listar Chamados por Status
-    public void listarChamadosPorStatus() {
-        String status = JOptionPane.showInputDialog("Digite o status para filtrar (Aberto, Em atendimento, Resolvido):");
-
-        if (status == null || status.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Erro: O status não pode ser vazio!");
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder("Chamados com status '").append(status).append("':\n");
-        boolean encontrou = false;
-
-        for (Chamado chamado : chamados) {
-            if (chamado.getStatus().equalsIgnoreCase(status)) {
-                sb.append(chamado.getTitulo()).append(" - ").append(chamado.getDescricao()).append("\n");
-                encontrou = true;
-            }
-        }
-
-        if (!encontrou) {
-            sb.append("Nenhum chamado encontrado com esse status.");
-        }
-
-        JOptionPane.showMessageDialog(null, sb.toString());
+    // Método principal
+    public static void main(String[] args) {
+        SistemaHelpDesk sistema = new SistemaHelpDesk();
+        sistema.menu();
     }
 
-    // Menu principal
+    // Menu de opções
     public void menu() {
         while (true) {
             String opcoes = """
@@ -194,27 +193,20 @@ public class SistemaHelpDesk {
                 2. Cadastrar Técnico
                 3. Abrir Chamado
                 4. Atribuir Técnico ao Chamado
-                5. Listar Chamados por Status
-                6. Atualizar Status do Chamado
-                7. Sair
+                5. Atualizar Status do Chamado
+                6. Sair
             """;
             String escolha = JOptionPane.showInputDialog(opcoes);
 
             switch (escolha) {
-                case "1" -> cadastrarFuncionario1();
-                case "2" -> cadastrarTecnico1();
-                case "3" -> abrirChamado1();
-                case "4" -> atribuirTecnicoChamado1();
-                case "5" -> listarChamadosPorStatus();
-                case "6" -> atualizarStatusChamado1();
-                case "7" -> System.exit(0);
+                case "1" -> cadastrarFuncionario();
+                case "2" -> cadastrarTecnico();
+                case "3" -> abrirChamado();
+                case "4" -> atribuirTecnicoChamado();
+                case "5" -> atualizarStatusChamado();
+                case "6" -> System.exit(0);
                 default -> JOptionPane.showMessageDialog(null, "Opção inválida!");
             }
         }
-    }
-
-    public static void main(String[] args) {
-        SistemaHelpDesk sistema = new SistemaHelpDesk();
-        sistema.menu();
     }
 }
